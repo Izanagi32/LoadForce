@@ -2,9 +2,11 @@
 
 import { useState, useEffect, useCallback } from 'react';
 import dynamic from 'next/dynamic';
-import { Calculator, MapPin, Settings, BarChart3, Download, Trash2, ChevronDown, ChevronRight } from 'lucide-react';
+import { Calculator, MapPin, Settings, BarChart3, Download, Trash2, ChevronDown, ChevronRight, RefreshCw } from 'lucide-react';
 import CargoForm from '@/components/CargoForm';
 import { routeCalculator } from '@/lib/calculator';
+import { clearRouteCache } from '@/lib/routing';
+import { clearCoordinatesCache } from '@/lib/geocoding';
 import type { CargoItem, RouteCalculationParams, CalculationResult } from '@/types/calculation';
 
 // Динамічно імпортуємо RouteMap тільки на клієнті
@@ -120,6 +122,18 @@ export default function CalculatorPage() {
     });
   };
 
+  const clearAllCaches = () => {
+    clearRouteCache();
+    clearCoordinatesCache();
+    console.log('🧹 All caches cleared - recalculating routes...');
+    
+    // Перерахувати результати після очищення кешу
+    if (cargo.length > 0) {
+      setCalculationResult(null);
+      setIsCalculating(true);
+    }
+  };
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-900 via-purple-900 to-slate-900">
       {/* Технологічний Header */}
@@ -141,6 +155,15 @@ export default function CalculatorPage() {
             </div>
             
             <div className="flex items-center space-x-2">
+              <button 
+                onClick={clearAllCaches}
+                className="group relative flex items-center px-3 py-1.5 text-xs text-yellow-300 hover:text-white bg-white/5 hover:bg-white/10 rounded-lg border border-white/10 hover:border-yellow-500/50 transition-all duration-300"
+                title="Очистити кеш маршрутів і перерахувати відстані"
+              >
+                <RefreshCw className="w-3 h-3 mr-1 group-hover:animate-spin" />
+                Кеш
+                <div className="absolute inset-0 rounded-lg bg-gradient-to-r from-yellow-500/0 to-orange-500/0 group-hover:from-yellow-500/20 group-hover:to-orange-500/20 transition-all duration-300"></div>
+              </button>
               <button className="group relative flex items-center px-3 py-1.5 text-xs text-cyan-300 hover:text-white bg-white/5 hover:bg-white/10 rounded-lg border border-white/10 hover:border-cyan-500/50 transition-all duration-300">
                 <Download className="w-3 h-3 mr-1 group-hover:animate-bounce" />
                 PDF

@@ -8,6 +8,38 @@ export interface RouteData {
 }
 
 /**
+ * Перевіряє чи є відстань розумною для українських міст
+ */
+function validateUkrainianCityDistance(fromCity: string, toCity: string, distance: number): boolean {
+  const ukrainianCities = [
+    'київ', 'львів', 'одеса', 'харків', 'дніпро', 'запоріжжя', 'кривий ріг', 
+    'миколаїв', 'маріуполь', 'луганськ', 'вінниця', 'макіївка', 'сімферополь',
+    'херсон', 'полтава', 'чернігів', 'черкаси', 'житомир', 'суми', 'хмельницький',
+    'чернівці', 'ровно', 'кропивницький', 'івано-франківськ', 'кременчук', 'тернопіль',
+    'луцьк', 'біла церква', 'краматорськ', 'мелітополь', 'керч', 'нікополь',
+    'бердянськ', 'ужгород', 'славянськ', 'алчевськ', 'павлоград', 'сєвєродонецьк',
+    'лисичанськ', 'евпаторія', 'каменское', 'александрия', 'красный луч', 'енакиево',
+    'стрий', 'новая каховка', 'измаил', 'константиновка', 'дрогобыч', 'балаклея',
+    'мукачево', 'умань', 'коломыя', 'яремче', 'бердичев', 'белая церковь',
+    'оржів', 'оржев'
+  ];
+  
+  const fromLower = fromCity.toLowerCase().trim();
+  const toLower = toCity.toLowerCase().trim();
+  
+  const isFromUkrainian = ukrainianCities.some(city => fromLower.includes(city) || city.includes(fromLower));
+  const isToUkrainian = ukrainianCities.some(city => toLower.includes(city) || city.includes(toLower));
+  
+  // Якщо обидва міста українські, відстань не повинна перевищувати 1500 км
+  if (isFromUkrainian && isToUkrainian && distance > 1500000) { // 1500 км в метрах
+    console.warn(`🚫 Suspicious distance for Ukrainian cities: ${fromCity} → ${toCity} = ${Math.round(distance/1000)}km`);
+    return false;
+  }
+  
+  return true;
+}
+
+/**
  * Отримує маршрут між двома містами використовуючи динамічний геокодінг
  */
 export async function getRoute(fromCity: string, toCity: string): Promise<RouteData> {
@@ -58,12 +90,24 @@ export async function getRoute(fromCity: string, toCity: string): Promise<RouteD
       if (response.data?.routes?.[0]) {
         const route = response.data.routes[0];
         const coordinates = route.geometry.coordinates;
+        const distance = Math.round(route.distance || 0);
         
-        console.log(`✅ OSRM success: ${coordinates.length} points, ${Math.round(route.distance/1000)}km`);
+        console.log(`✅ OSRM success: ${coordinates.length} points, ${Math.round(distance/1000)}km`);
+
+        // Валідуємо відстань для українських міст
+        if (!validateUkrainianCityDistance(fromCity, toCity, distance)) {
+          console.warn(`🔧 Using corrected distance for ${fromCity} → ${toCity}`);
+          const correctedDistance = getCorrectedUkrainianDistance(fromCity, toCity, fromCoords, toCoords);
+          return {
+            coordinates: coordinates,
+            distance: correctedDistance,
+            duration: Math.round(correctedDistance / 1000 * 50)
+          };
+        }
 
         return {
           coordinates: coordinates,
-          distance: Math.round(route.distance || 0),
+          distance: distance,
           duration: Math.round(route.duration || 0)
         };
       }
@@ -137,6 +181,58 @@ function calculateStraightLineDistance(
     Math.sin(dLng / 2) * Math.sin(dLng / 2);
   const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
   return R * c;
+}
+
+/**
+ * Повертає коригованої відстані для українських міст
+ */
+function getCorrectedUkrainianDistance(
+  fromCity: string, 
+  toCity: string, 
+  fromCoords: [number, number], 
+  toCoords: [number, number]
+): number {
+  const from = fromCity.toLowerCase().trim();
+  const to = toCity.toLowerCase().trim();
+  
+  // Відомі відстані між українськими містами (в метрах)
+  const knownDistances: Record<string, number> = {
+    'львів-луцьк': 150000,
+    'луцьк-львів': 150000,
+    'львів-київ': 540000,
+    'київ-львів': 540000,
+    'львів-івано-франківськ': 135000,
+    'івано-франківськ-львів': 135000,
+    'львів-тернопіль': 120000,
+    'тернопіль-львів': 120000,
+    'львів-ужгород': 265000,
+    'ужгород-львів': 265000,
+    'луцьк-київ': 395000,
+    'київ-луцьк': 395000,
+    'оржів-київ': 380000,
+    'київ-оржів': 380000,
+    'оржів-львів': 420000,
+    'львів-оржів': 420000,
+  };
+  
+  // Шукаємо точну відстань
+  const key1 = `${from}-${to}`;
+  const key2 = `${to}-${from}`;
+  
+  if (knownDistances[key1]) {
+    console.log(`📏 Using known distance for ${fromCity} → ${toCity}: ${knownDistances[key1]/1000}km`);
+    return knownDistances[key1];
+  }
+  
+  if (knownDistances[key2]) {
+    console.log(`📏 Using known distance for ${fromCity} → ${toCity}: ${knownDistances[key2]/1000}km`);
+    return knownDistances[key2];
+  }
+  
+  // Якщо немає точної відстані, використовуємо пряму лінію з коефіцієнтом 1.4
+  const straightDistance = calculateStraightLineDistance(fromCoords, toCoords) * 1000 * 1.4;
+  console.log(`📏 Using calculated distance for ${fromCity} → ${toCity}: ${Math.round(straightDistance/1000)}km`);
+  return Math.round(straightDistance);
 }
 
 /**
