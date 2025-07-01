@@ -4,6 +4,7 @@ import { useState, useEffect, useCallback } from 'react';
 import dynamic from 'next/dynamic';
 import { Calculator, MapPin, Settings, BarChart3, Download, Trash2, ChevronDown, ChevronRight, RefreshCw } from 'lucide-react';
 import CargoForm from '@/components/CargoForm';
+import AIInsights from '@/components/AIInsights';
 import { routeCalculator } from '@/lib/calculator';
 import { clearRouteCache } from '@/lib/routing';
 import { clearCoordinatesCache } from '@/lib/geocoding';
@@ -870,9 +871,10 @@ export default function CalculatorPage() {
             </div>
           </div>
 
-          {/* Технологічна права панель - Карта */}
-          <div className="col-span-12 lg:col-span-3">
-            <div className="bg-black/30 backdrop-blur-xl rounded-xl border border-white/10 shadow-2xl shadow-blue-500/10 h-[600px]">
+          {/* Технологічна права панель - Карта та AI */}
+          <div className="col-span-12 lg:col-span-3 space-y-4">
+            {/* Карта маршруту */}
+            <div className="bg-black/30 backdrop-blur-xl rounded-xl border border-white/10 shadow-2xl shadow-blue-500/10 h-[400px]">
               <div className="px-4 py-3 border-b border-white/10">
                 <div className="flex items-center space-x-2">
                   <MapPin className="w-4 h-4 text-blue-400 animate-pulse" />
@@ -890,6 +892,14 @@ export default function CalculatorPage() {
                 />
               </div>
             </div>
+
+            {/* AI Аналітика */}
+            <AIInsights 
+              cargoItems={cargo}
+              routeDistance={calculationResult?.totalDistance || 0}
+              totalWeight={calculationResult?.totalWeight || 0}
+              fuelCosts={calculationResult?.costs.fuel || 0}
+            />
           </div>
 
         </div>
