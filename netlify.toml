@@ -1,0 +1,46 @@
+[build]
+  # Команда збірки
+  command = "npm run build"
+  
+  # Папка з результатом збірки
+  publish = "out"
+  
+  # Node.js версія
+  environment = { NODE_VERSION = "18" }
+
+[build.environment]
+  # Змінні середовища для збірки
+  NODE_ENV = "production"
+  NEXT_TELEMETRY_DISABLED = "1"
+
+# Налаштування SPA для маршрутизації
+[[redirects]]
+  from = "/*"
+  to = "/index.html"
+  status = 200
+
+# Налаштування кешування
+[[headers]]
+  for = "/static/*"
+  [headers.values]
+    Cache-Control = "public, max-age=31536000, immutable"
+
+[[headers]]
+  for = "/*.js"
+  [headers.values]
+    Cache-Control = "public, max-age=31536000, immutable"
+
+[[headers]]
+  for = "/*.css"
+  [headers.values]
+    Cache-Control = "public, max-age=31536000, immutable"
+
+# Заголовки безпеки
+[[headers]]
+  for = "/*"
+  [headers.values]
+    X-Frame-Options = "DENY"
+    X-XSS-Protection = "1; mode=block"
+    X-Content-Type-Options = "nosniff"
+    Referrer-Policy = "strict-origin-when-cross-origin"
+    Permissions-Policy = "camera=(), microphone=(), geolocation=()" 
