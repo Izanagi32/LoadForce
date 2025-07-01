@@ -1,14 +1,9 @@
-// 🤖 EuroTandemFORCE AI Module
-// Локальний штучний інтелект для логістики
+/**
+ * EuroTandemFORCE AI System
+ * Локальна система штучного інтелекту для логістики
+ */
 
-export { FuelCostPredictor } from './fuelPredictor';
-export { RouteOptimizer } from './routeOptimizer';
-export { AnomalyDetector } from './anomalyDetector';
-export { DeliveryTimePredictor } from './deliveryTimePredictor';
-export { PriceOptimizer } from './priceOptimizer';
-export { RouteRecommendationEngine } from './recommendations';
-
-// Типи для AI
+// Основні AI типи та інтерфейси
 export interface AIHistoricalData {
   id: string;
   date: string;
@@ -21,8 +16,7 @@ export interface AIHistoricalData {
   };
   cargoWeight: number;
   cargoVolume: number;
-  weather?: string;
-  traffic?: number;
+  weather: string;
 }
 
 export interface AIPrediction {
@@ -33,10 +27,22 @@ export interface AIPrediction {
 }
 
 export interface AIRecommendation {
-  type: 'route' | 'pricing' | 'timing' | 'fuel';
-  priority: 'high' | 'medium' | 'low';
+  id: string;
   title: string;
   description: string;
+  priority: 'low' | 'medium' | 'high';
   expectedSaving: number;
   currency: string;
-} 
+  category: string;
+}
+
+// Експорт AI модулів
+export { FuelCostPredictor } from './fuelPredictor';
+export { RouteOptimizer } from './routeOptimizer';
+export { AnomalyDetector } from './anomalyDetector';
+export { DeliveryTimePredictor } from './deliveryTimePredictor';
+export { PriceOptimizer } from './priceOptimizer';
+export { RouteRecommendationEngine } from './recommendations';
+
+// Нові розумні модулі
+export { businessAnalyzer, type SmartRecommendation, type BusinessMetrics, type BusinessInsight } from './businessAnalyzer'; 
