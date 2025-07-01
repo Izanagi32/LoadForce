@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useCallback } from 'react';
 import dynamic from 'next/dynamic';
-import { Calculator, MapPin, Settings, BarChart3, Download, Trash2 } from 'lucide-react';
+import { Calculator, MapPin, Settings, BarChart3, Download, Trash2, ChevronDown, ChevronRight } from 'lucide-react';
 import CargoForm from '@/components/CargoForm';
 import { routeCalculator } from '@/lib/calculator';
 import type { CargoItem, RouteCalculationParams, CalculationResult } from '@/types/calculation';
@@ -30,6 +30,7 @@ export default function CalculatorPage() {
   const [cargo, setCargo] = useState<CargoItem[]>([]);
   const [calculationResult, setCalculationResult] = useState<CalculationResult | null>(null);
   const [isCalculating, setIsCalculating] = useState(false);
+  const [expandedExpenses, setExpandedExpenses] = useState<Set<string>>(new Set());
   const [params, setParams] = useState<RouteCalculationParams>({
     baseCurrency: 'UAH',
     exchangeRates: {
@@ -105,6 +106,18 @@ export default function CalculatorPage() {
       minimumFractionDigits: 0,
       maximumFractionDigits: 0,
     }).format(amount);
+  };
+
+  const toggleExpenseCategory = (category: string) => {
+    setExpandedExpenses(prev => {
+      const newSet = new Set(prev);
+      if (newSet.has(category)) {
+        newSet.delete(category);
+      } else {
+        newSet.add(category);
+      }
+      return newSet;
+    });
   };
 
   return (
@@ -502,36 +515,56 @@ export default function CalculatorPage() {
                             ) : calculationResult ? (
                 <div className="p-4 space-y-4">
                   {/* Технологічна загальна інформація */}
-                  <div className="grid grid-cols-3 gap-3">
-                    <div className="relative group">
-                      <div className="absolute inset-0 bg-gradient-to-r from-blue-500 to-cyan-500 rounded-xl opacity-20 group-hover:opacity-30 transition-opacity"></div>
-                      <div className="relative bg-black/40 border border-blue-500/30 p-4 rounded-xl backdrop-blur-sm">
-                        <div className="text-xl font-bold text-blue-300 flex items-center">
-                          🛣️ {calculationResult!.totalDistance.toLocaleString()}
+                  <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                    {/* Відстань */}
+                    <div className="bg-gradient-to-br from-blue-900/40 to-cyan-900/40 backdrop-blur-md border border-blue-500/20 rounded-xl p-4 hover:border-blue-400/40 transition-all duration-300">
+                      <div className="flex items-center justify-between mb-3">
+                        <span className="text-blue-400 text-lg">🛣️</span>
+                        <div className="text-right">
+                          <div className="text-xl font-bold text-white">
+                            {calculationResult!.totalDistance.toLocaleString()}
+                          </div>
+                          <div className="text-blue-300 text-xs">км</div>
                         </div>
-                        <div className="text-xs text-blue-400">Загальна відстань (км)</div>
-                        <div className="text-xs text-blue-500 mt-1 space-y-0.5">
-                          <div>📦 Доставка: {calculationResult!.distanceBreakdown.deliveryDistance.toLocaleString()} км</div>
-                          <div>🚚 Переїзди: {calculationResult!.distanceBreakdown.repositioningDistance.toLocaleString()} км</div>
+                      </div>
+                      <div className="text-blue-200 text-sm font-medium mb-2">Загальна відстань</div>
+                      <div className="space-y-1 text-xs">
+                        <div className="flex justify-between text-blue-300/70">
+                          <span>📦 Доставка</span>
+                          <span>{calculationResult!.distanceBreakdown.deliveryDistance.toLocaleString()} км</span>
+                        </div>
+                        <div className="flex justify-between text-blue-300/70">
+                          <span>🚚 Переїзди</span>
+                          <span>{calculationResult!.distanceBreakdown.repositioningDistance.toLocaleString()} км</span>
                         </div>
                       </div>
                     </div>
-                    <div className="relative group">
-                      <div className="absolute inset-0 bg-gradient-to-r from-emerald-500 to-green-500 rounded-xl opacity-20 group-hover:opacity-30 transition-opacity"></div>
-                      <div className="relative bg-black/40 border border-emerald-500/30 p-4 rounded-xl backdrop-blur-sm">
-                        <div className="text-xl font-bold text-emerald-300 flex items-center">
-                          ⚖️ {(calculationResult!.totalWeight * 1000).toLocaleString()}
+                    
+                    {/* Вага */}
+                    <div className="bg-gradient-to-br from-emerald-900/40 to-green-900/40 backdrop-blur-md border border-emerald-500/20 rounded-xl p-4 hover:border-emerald-400/40 transition-all duration-300">
+                      <div className="text-center">
+                        <div className="text-lg mb-2">⚖️</div>
+                        <div className="text-xl font-bold text-white mb-1">
+                          {(calculationResult!.totalWeight * 1000).toLocaleString()}
                         </div>
-                        <div className="text-xs text-emerald-400">Вага (кг)</div>
+                        <div className="text-emerald-200 text-sm font-medium mb-1">Вага (кг)</div>
+                        <div className="text-emerald-300/70 text-xs">
+                          {calculationResult!.totalWeight.toFixed(1)} тонн
+                        </div>
                       </div>
                     </div>
-                    <div className="relative group">
-                      <div className="absolute inset-0 bg-gradient-to-r from-purple-500 to-pink-500 rounded-xl opacity-20 group-hover:opacity-30 transition-opacity"></div>
-                      <div className="relative bg-black/40 border border-purple-500/30 p-4 rounded-xl backdrop-blur-sm">
-                        <div className="text-xl font-bold text-purple-300 truncate flex items-center">
-                          💰 {formatCurrency(calculationResult!.totalFreight)}
+                    
+                    {/* Фрахт */}
+                    <div className="bg-gradient-to-br from-purple-900/40 to-pink-900/40 backdrop-blur-md border border-purple-500/20 rounded-xl p-4 hover:border-purple-400/40 transition-all duration-300">
+                      <div className="text-center">
+                        <div className="text-lg mb-2">💰</div>
+                        <div className="text-xl font-bold text-white mb-1">
+                          {formatCurrency(calculationResult!.totalFreight)}
                         </div>
-                        <div className="text-xs text-purple-400">Фрахт</div>
+                        <div className="text-purple-200 text-sm font-medium mb-1">Фрахт</div>
+                        <div className="text-purple-300/70 text-xs">
+                          {formatCurrency(calculationResult!.totalFreight / calculationResult!.totalDistance, 'UAH')}/км
+                        </div>
                       </div>
                     </div>
                   </div>
@@ -592,44 +625,171 @@ export default function CalculatorPage() {
                       <div className="ml-2 w-1 h-1 bg-cyan-400 rounded-full animate-ping"></div>
                     </h4>
                     <div className="space-y-3">
-                      <div className="flex items-center justify-between p-3 bg-white/5 border border-orange-500/30 rounded-lg backdrop-blur-sm hover:bg-white/10 transition-all group">
-                        <span className="text-orange-300 flex items-center text-sm group-hover:text-orange-200">
-                          ⛽ Паливо 
-                          <span className="text-xs text-orange-400 ml-2 bg-orange-500/20 px-2 py-1 rounded-full">
-                            {calculationResult.costBreakdown.fuel.percentage.toFixed(1)}%
+                      {/* Паливо - Розгортається */}
+                      <div className="bg-white/5 border border-orange-500/30 rounded-lg backdrop-blur-sm overflow-hidden">
+                        <button
+                          onClick={() => toggleExpenseCategory('fuel')}
+                          className="w-full flex items-center justify-between p-3 hover:bg-white/10 transition-all group"
+                        >
+                          <span className="text-orange-300 flex items-center text-sm group-hover:text-orange-200">
+                            ⛽ Паливо 
+                            <span className="text-xs text-orange-400 ml-2 bg-orange-500/20 px-2 py-1 rounded-full">
+                              {calculationResult.costBreakdown.fuel.percentage.toFixed(1)}%
+                            </span>
                           </span>
-                        </span>
-                        <span className="font-bold text-orange-300">{formatCurrency(calculationResult.costs.fuel)}</span>
+                          <div className="flex items-center space-x-2">
+                            <span className="font-bold text-orange-300">{formatCurrency(calculationResult.costs.fuel)}</span>
+                            {expandedExpenses.has('fuel') ? (
+                              <ChevronDown className="w-4 h-4 text-orange-300" />
+                            ) : (
+                              <ChevronRight className="w-4 h-4 text-orange-300" />
+                            )}
+                          </div>
+                        </button>
+                        {expandedExpenses.has('fuel') && (
+                          <div className="px-4 pb-3 space-y-2 border-t border-orange-500/20">
+                            <div className="grid grid-cols-2 gap-3 mt-3">
+                              <div className="bg-orange-500/10 p-2 rounded">
+                                <div className="text-xs text-orange-400">📦 Доставка</div>
+                                <div className="text-orange-300 font-bold">{formatCurrency(calculationResult.costBreakdown.fuel.details.delivery)}</div>
+                                <div className="text-xs text-orange-500">{calculationResult.costBreakdown.fuel.details.deliveryLiters.toFixed(1)}л</div>
+                              </div>
+                              <div className="bg-orange-500/10 p-2 rounded">
+                                <div className="text-xs text-orange-400">🚚 Переїзди</div>
+                                <div className="text-orange-300 font-bold">{formatCurrency(calculationResult.costBreakdown.fuel.details.repositioning)}</div>
+                                <div className="text-xs text-orange-500">{calculationResult.costBreakdown.fuel.details.repositioningLiters.toFixed(1)}л</div>
+                              </div>
+                            </div>
+                            <div className="bg-orange-500/5 p-2 rounded text-xs text-orange-400">
+                              💰 Ціна: {calculationResult.costBreakdown.fuel.details.pricePerLiter} {calculationResult.costBreakdown.fuel.details.currency}/л × {calculationResult.costBreakdown.fuel.details.totalLiters.toFixed(1)}л
+                            </div>
+                          </div>
+                        )}
                       </div>
                       
-                      <div className="flex items-center justify-between p-3 bg-white/5 border border-blue-500/30 rounded-lg backdrop-blur-sm hover:bg-white/10 transition-all group">
-                        <span className="text-blue-300 flex items-center text-sm group-hover:text-blue-200">
-                          👨‍✈️ Водій 
-                          <span className="text-xs text-blue-400 ml-2 bg-blue-500/20 px-2 py-1 rounded-full">
-                            {calculationResult.costBreakdown.driver.percentage.toFixed(1)}%
+                      {/* Водій - Розгортається */}
+                      <div className="bg-white/5 border border-blue-500/30 rounded-lg backdrop-blur-sm overflow-hidden">
+                        <button
+                          onClick={() => toggleExpenseCategory('driver')}
+                          className="w-full flex items-center justify-between p-3 hover:bg-white/10 transition-all group"
+                        >
+                          <span className="text-blue-300 flex items-center text-sm group-hover:text-blue-200">
+                            👨‍✈️ Водій 
+                            <span className="text-xs text-blue-400 ml-2 bg-blue-500/20 px-2 py-1 rounded-full">
+                              {calculationResult.costBreakdown.driver.percentage.toFixed(1)}%
+                            </span>
                           </span>
-                        </span>
-                        <span className="font-bold text-blue-300">{formatCurrency(calculationResult.costs.driver)}</span>
+                          <div className="flex items-center space-x-2">
+                            <span className="font-bold text-blue-300">{formatCurrency(calculationResult.costs.driver)}</span>
+                            {expandedExpenses.has('driver') ? (
+                              <ChevronDown className="w-4 h-4 text-blue-300" />
+                            ) : (
+                              <ChevronRight className="w-4 h-4 text-blue-300" />
+                            )}
+                          </div>
+                        </button>
+                        {expandedExpenses.has('driver') && (
+                          <div className="px-4 pb-3 space-y-2 border-t border-blue-500/20">
+                            <div className="grid grid-cols-2 gap-3 mt-3">
+                              <div className="bg-blue-500/10 p-2 rounded">
+                                <div className="text-xs text-blue-400">📊 Відсоток</div>
+                                <div className="text-blue-300 font-bold">{calculationResult.costBreakdown.driver.details.adjustedPercentage.toFixed(1)}%</div>
+                                <div className="text-xs text-blue-500">
+                                  {calculationResult.costBreakdown.driver.details.isFullLoad ? 'Повне завантаження' : 'Часткове завантаження'}
+                                </div>
+                              </div>
+                              <div className="bg-blue-500/10 p-2 rounded">
+                                <div className="text-xs text-blue-400">💰 Фрахт</div>
+                                <div className="text-blue-300 font-bold">{formatCurrency(calculationResult.costBreakdown.driver.details.totalFreight)}</div>
+                                <div className="text-xs text-blue-500">Базовий: {calculationResult.costBreakdown.driver.details.basePercentage}%</div>
+                              </div>
+                            </div>
+                          </div>
+                        )}
                       </div>
                       
-                      <div className="flex items-center justify-between p-3 bg-white/5 border border-purple-500/30 rounded-lg backdrop-blur-sm hover:bg-white/10 transition-all group">
-                        <span className="text-purple-300 flex items-center text-sm group-hover:text-purple-200">
-                          🏨 Добові 
-                          <span className="text-xs text-purple-400 ml-2 bg-purple-500/20 px-2 py-1 rounded-full">
-                            {calculationResult.costBreakdown.daily.percentage.toFixed(1)}%
+                      {/* Добові - Розгортається */}
+                      <div className="bg-white/5 border border-purple-500/30 rounded-lg backdrop-blur-sm overflow-hidden">
+                        <button
+                          onClick={() => toggleExpenseCategory('daily')}
+                          className="w-full flex items-center justify-between p-3 hover:bg-white/10 transition-all group"
+                        >
+                          <span className="text-purple-300 flex items-center text-sm group-hover:text-purple-200">
+                            🏨 Добові 
+                            <span className="text-xs text-purple-400 ml-2 bg-purple-500/20 px-2 py-1 rounded-full">
+                              {calculationResult.costBreakdown.daily.percentage.toFixed(1)}%
+                            </span>
                           </span>
-                        </span>
-                        <span className="font-bold text-purple-300">{formatCurrency(calculationResult.costs.daily)}</span>
+                          <div className="flex items-center space-x-2">
+                            <span className="font-bold text-purple-300">{formatCurrency(calculationResult.costs.daily)}</span>
+                            {expandedExpenses.has('daily') ? (
+                              <ChevronDown className="w-4 h-4 text-purple-300" />
+                            ) : (
+                              <ChevronRight className="w-4 h-4 text-purple-300" />
+                            )}
+                          </div>
+                        </button>
+                        {expandedExpenses.has('daily') && (
+                          <div className="px-4 pb-3 space-y-2 border-t border-purple-500/20">
+                            <div className="grid grid-cols-2 gap-3 mt-3">
+                              <div className="bg-purple-500/10 p-2 rounded">
+                                <div className="text-xs text-purple-400">📅 За день</div>
+                                <div className="text-purple-300 font-bold">{calculationResult.costBreakdown.daily.details.ratePerDay} {calculationResult.costBreakdown.daily.details.currency}</div>
+                              </div>
+                              <div className="bg-purple-500/10 p-2 rounded">
+                                <div className="text-xs text-purple-400">⏰ Днів</div>
+                                <div className="text-purple-300 font-bold">{calculationResult.costBreakdown.daily.details.numberOfDays}</div>
+                              </div>
+                            </div>
+                            <div className="bg-purple-500/5 p-2 rounded text-xs text-purple-400">
+                              💰 Розрахунок: {calculationResult.costBreakdown.daily.details.ratePerDay} × {calculationResult.costBreakdown.daily.details.numberOfDays} = {calculationResult.costBreakdown.daily.details.originalAmount} {calculationResult.costBreakdown.daily.details.currency}
+                            </div>
+                          </div>
+                        )}
                       </div>
                       
-                      <div className="flex items-center justify-between p-3 bg-white/5 border border-pink-500/30 rounded-lg backdrop-blur-sm hover:bg-white/10 transition-all group">
-                        <span className="text-pink-300 flex items-center text-sm group-hover:text-pink-200">
-                          💼 Додаткові 
-                          <span className="text-xs text-pink-400 ml-2 bg-pink-500/20 px-2 py-1 rounded-full">
-                            {calculationResult.costBreakdown.additional.percentage.toFixed(1)}%
+                      {/* Додаткові - Розгортається */}
+                      <div className="bg-white/5 border border-pink-500/30 rounded-lg backdrop-blur-sm overflow-hidden">
+                        <button
+                          onClick={() => toggleExpenseCategory('additional')}
+                          className="w-full flex items-center justify-between p-3 hover:bg-white/10 transition-all group"
+                        >
+                          <span className="text-pink-300 flex items-center text-sm group-hover:text-pink-200">
+                            💼 Додаткові 
+                            <span className="text-xs text-pink-400 ml-2 bg-pink-500/20 px-2 py-1 rounded-full">
+                              {calculationResult.costBreakdown.additional.percentage.toFixed(1)}%
+                            </span>
                           </span>
-                        </span>
-                        <span className="font-bold text-pink-300">{formatCurrency(calculationResult.costs.additional)}</span>
+                          <div className="flex items-center space-x-2">
+                            <span className="font-bold text-pink-300">{formatCurrency(calculationResult.costs.additional)}</span>
+                            {expandedExpenses.has('additional') ? (
+                              <ChevronDown className="w-4 h-4 text-pink-300" />
+                            ) : (
+                              <ChevronRight className="w-4 h-4 text-pink-300" />
+                            )}
+                          </div>
+                        </button>
+                        {expandedExpenses.has('additional') && (
+                          <div className="px-4 pb-3 space-y-2 border-t border-pink-500/20">
+                            <div className="grid grid-cols-3 gap-2 mt-3">
+                              <div className="bg-pink-500/10 p-2 rounded">
+                                <div className="text-xs text-pink-400">🅿️ Парковка</div>
+                                <div className="text-pink-300 font-bold">{calculationResult.costBreakdown.additional.details.parking} {calculationResult.costBreakdown.additional.details.currency}</div>
+                              </div>
+                              <div className="bg-pink-500/10 p-2 rounded">
+                                <div className="text-xs text-pink-400">🌉 Дороги</div>
+                                <div className="text-pink-300 font-bold">{calculationResult.costBreakdown.additional.details.tolls} {calculationResult.costBreakdown.additional.details.currency}</div>
+                              </div>
+                              <div className="bg-pink-500/10 p-2 rounded">
+                                <div className="text-xs text-pink-400">⚡ Інші</div>
+                                <div className="text-pink-300 font-bold">{calculationResult.costBreakdown.additional.details.other} {calculationResult.costBreakdown.additional.details.currency}</div>
+                              </div>
+                            </div>
+                            <div className="bg-pink-500/5 p-2 rounded text-xs text-pink-400">
+                              💰 Всього: {calculationResult.costBreakdown.additional.details.totalInOriginalCurrency} {calculationResult.costBreakdown.additional.details.currency}
+                            </div>
+                          </div>
+                        )}
                       </div>
                       
                       <div className="flex items-center justify-between p-3 bg-gradient-to-r from-cyan-500/20 to-blue-500/20 border border-cyan-500/50 rounded-lg backdrop-blur-sm text-sm shadow-lg shadow-cyan-500/20">

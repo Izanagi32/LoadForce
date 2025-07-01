@@ -71,10 +71,50 @@ export interface CalculationResult {
   
   // Деталізація
   costBreakdown: {
-    fuel: { amount: number; percentage: number };
-    driver: { amount: number; percentage: number };
-    daily: { amount: number; percentage: number };
-    additional: { amount: number; percentage: number };
+    fuel: { 
+      amount: number; 
+      percentage: number;
+      details: {
+        delivery: number;
+        repositioning: number;
+        totalLiters: number;
+        deliveryLiters: number;
+        repositioningLiters: number;
+        pricePerLiter: number;
+        currency: string;
+      };
+    };
+    driver: { 
+      amount: number; 
+      percentage: number;
+      details: {
+        basePercentage: number;
+        adjustedPercentage: number;
+        isFullLoad: boolean;
+        totalFreight: number;
+      };
+    };
+    daily: { 
+      amount: number; 
+      percentage: number;
+      details: {
+        ratePerDay: number;
+        numberOfDays: number;
+        currency: string;
+        originalAmount: number;
+      };
+    };
+    additional: { 
+      amount: number; 
+      percentage: number;
+      details: {
+        parking: number;
+        tolls: number;
+        other: number;
+        currency: string;
+        totalInOriginalCurrency: number;
+      };
+    };
   };
 }
 

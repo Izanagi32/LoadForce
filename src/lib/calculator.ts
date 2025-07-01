@@ -232,19 +232,47 @@ export class RouteCalculator {
     const costBreakdown = {
       fuel: {
         amount: fuelCosts.total,
-        percentage: totalCosts > 0 ? (fuelCosts.total / totalCosts) * 100 : 0
+        percentage: totalCosts > 0 ? (fuelCosts.total / totalCosts) * 100 : 0,
+        details: {
+          delivery: fuelCosts.delivery,
+          repositioning: fuelCosts.repositioning,
+          totalLiters: (distanceData.totalDistance / 100) * params.fuelConsumption,
+          deliveryLiters: (distanceData.deliveryDistance / 100) * params.fuelConsumption,
+          repositioningLiters: (distanceData.repositioningDistance / 100) * params.fuelConsumption,
+          pricePerLiter: params.fuelPrice,
+          currency: params.fuelCurrency
+        }
       },
       driver: {
         amount: driverSalary,
-        percentage: totalCosts > 0 ? (driverSalary / totalCosts) * 100 : 0
+        percentage: totalCosts > 0 ? (driverSalary / totalCosts) * 100 : 0,
+        details: {
+          basePercentage: params.driverSalaryPercentage,
+          adjustedPercentage: params.isFullLoad ? params.driverSalaryPercentage : params.driverSalaryPercentage * 0.8,
+          isFullLoad: params.isFullLoad,
+          totalFreight: totalFreight
+        }
       },
       daily: {
         amount: dailyCosts,
-        percentage: totalCosts > 0 ? (dailyCosts / totalCosts) * 100 : 0
+        percentage: totalCosts > 0 ? (dailyCosts / totalCosts) * 100 : 0,
+        details: {
+          ratePerDay: params.dailyRate,
+          numberOfDays: params.tripDays,
+          currency: params.dailyRateCurrency,
+          originalAmount: params.dailyRate * params.tripDays
+        }
       },
       additional: {
         amount: additionalCosts,
-        percentage: totalCosts > 0 ? (additionalCosts / totalCosts) * 100 : 0
+        percentage: totalCosts > 0 ? (additionalCosts / totalCosts) * 100 : 0,
+        details: {
+          parking: params.additionalCosts.parking,
+          tolls: params.additionalCosts.tolls,
+          other: params.additionalCosts.other,
+          currency: params.additionalCostsCurrency,
+          totalInOriginalCurrency: params.additionalCosts.parking + params.additionalCosts.tolls + params.additionalCosts.other
+        }
       }
     };
 
