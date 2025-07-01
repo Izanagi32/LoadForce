@@ -57,7 +57,7 @@ export default function HomePage() {
             
             <div className="text-center p-6 bg-white/10 rounded-lg backdrop-blur-sm">
               <Truck className="w-12 h-12 text-blue-200 mx-auto mb-4" />
-              <h3 className="text-lg font-semibold mb-2">Управління флотом</h3>
+              <h3 className="text-lg font-semibold mb-2">Управління</h3>
               <p className="text-blue-100 text-sm">
                 Оптимізація використання транспортних засобів
               </p>
