@@ -23,6 +23,13 @@ const nextConfig: NextConfig = {
   typescript: {
     ignoreBuildErrors: false,
   },
+
+  // Turbopack налаштування (заміна deprecated experimental.turbo)
+  turbopack: {
+    resolveAlias: {
+      canvas: './empty-module.js',
+    },
+  },
 };
 
 export default nextConfig;

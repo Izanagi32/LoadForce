@@ -7,7 +7,7 @@
 
 [build.environment]
   # Environment variables for build
-  NODE_VERSION = "18"
+  NODE_VERSION = "20"
   NODE_ENV = "production"
   NEXT_TELEMETRY_DISABLED = "1"
 
