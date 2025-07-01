@@ -159,7 +159,8 @@ export class PriceOptimizer {
 
     if (lowMarginTrips.length > 5) {
       recommendations.push({
-        type: 'pricing',
+        id: 'pricing-recommendation',
+        category: 'pricing',
         priority: 'high',
         title: 'Низька маржа рейсів',
         description: `Виявлено ${lowMarginTrips.length} рейсів з низькою маржею. Необхідно переглянути ціноутворення.`,
@@ -181,7 +182,8 @@ export class PriceOptimizer {
 
     if (frequentRoutes.length > 0) {
       recommendations.push({
-        type: 'pricing',
+        id: 'pricing-recommendation',
+        category: 'pricing',
         priority: 'medium',
         title: 'Оптимізація цін частих маршрутів',
         description: 'Для частих маршрутів можна запропонувати пакетні тарифи клієнтам.',
@@ -251,3 +253,4 @@ export class PriceOptimizer {
     };
   }
 } 
+

@@ -98,69 +98,70 @@ export default function RouteMap({ cargo, className = '', onRouteUpdate }: Route
     };
   }, []);
 
-  // Завантаження маршрутів
-  useEffect(() => {
+  // Функція завантаження маршрутів
+  const loadAllRoutes = useCallback(async () => {
     if (!isInitialized || cargo.length === 0) return;
 
-    const loadAllRoutes = async () => {
-      // Завантажуємо маршрути доставки
-      for (const item of cargo) {
-        const routeKey = `${item.loadingPoint}-${item.unloadingPoint}`;
+    // Завантажуємо маршрути доставки
+    for (const item of cargo) {
+      const routeKey = `${item.loadingPoint}-${item.unloadingPoint}`;
+      
+      if (!routes.has(routeKey)) {
+        setLoadingRoutes(prev => new Set([...prev, routeKey]));
         
-        if (!routes.has(routeKey)) {
-          setLoadingRoutes(prev => new Set([...prev, routeKey]));
+        try {
+          const routeData = await getCachedRoute(item.loadingPoint, item.unloadingPoint);
+          setRoutes(prev => new Map(prev.set(routeKey, routeData)));
+          
+          // Оновлюємо відстань
+          if (onRouteUpdate) {
+            const distanceKm = Math.round(routeData.distance / 1000);
+            onRouteUpdate(item.id, distanceKm);
+          }
+        } catch (error) {
+          console.error('Route loading failed:', routeKey, error);
+        } finally {
+          setLoadingRoutes(prev => {
+            const newSet = new Set(prev);
+            newSet.delete(routeKey);
+            return newSet;
+          });
+        }
+      }
+    }
+
+    // Завантажуємо маршрути переїздів
+    for (let i = 0; i < cargo.length - 1; i++) {
+      const from = cargo[i].unloadingPoint;
+      const to = cargo[i + 1].loadingPoint;
+      
+      if (from.toLowerCase() !== to.toLowerCase()) {
+        const repositionKey = `reposition-${from}-${to}`;
+        
+        if (!routes.has(repositionKey)) {
+          setLoadingRoutes(prev => new Set([...prev, repositionKey]));
           
           try {
-            const routeData = await getCachedRoute(item.loadingPoint, item.unloadingPoint);
-            setRoutes(prev => new Map(prev.set(routeKey, routeData)));
-            
-            // Оновлюємо відстань
-            if (onRouteUpdate) {
-              const distanceKm = Math.round(routeData.distance / 1000);
-              onRouteUpdate(item.id, distanceKm);
-            }
+            const routeData = await getCachedRoute(from, to);
+            setRoutes(prev => new Map(prev.set(repositionKey, routeData)));
           } catch (error) {
-            console.error('Route loading failed:', routeKey, error);
+            console.error('Reposition route loading failed:', repositionKey, error);
           } finally {
             setLoadingRoutes(prev => {
               const newSet = new Set(prev);
-              newSet.delete(routeKey);
+              newSet.delete(repositionKey);
               return newSet;
             });
           }
         }
       }
+    }
+  }, [cargo, isInitialized, onRouteUpdate, routes]);
 
-      // Завантажуємо маршрути переїздів
-      for (let i = 0; i < cargo.length - 1; i++) {
-        const from = cargo[i].unloadingPoint;
-        const to = cargo[i + 1].loadingPoint;
-        
-        if (from.toLowerCase() !== to.toLowerCase()) {
-          const repositionKey = `reposition-${from}-${to}`;
-          
-          if (!routes.has(repositionKey)) {
-            setLoadingRoutes(prev => new Set([...prev, repositionKey]));
-            
-            try {
-              const routeData = await getCachedRoute(from, to);
-              setRoutes(prev => new Map(prev.set(repositionKey, routeData)));
-            } catch (error) {
-              console.error('Reposition route loading failed:', repositionKey, error);
-            } finally {
-              setLoadingRoutes(prev => {
-                const newSet = new Set(prev);
-                newSet.delete(repositionKey);
-                return newSet;
-              });
-            }
-          }
-        }
-      }
-    };
-
+  // Завантаження маршрутів
+  useEffect(() => {
     loadAllRoutes();
-  }, [cargo, isInitialized, onRouteUpdate]);
+  }, [loadAllRoutes]);
 
   // Рендеринг карти
   useEffect(() => {
@@ -376,7 +377,7 @@ export default function RouteMap({ cargo, className = '', onRouteUpdate }: Route
     };
 
     renderMap();
-  }, [cargo, routes, loadingRoutes, isInitialized]);
+  }, [cargo, routes, loadingRoutes, isInitialized, clearAllLayers]);
 
   return (
     <div className={`relative ${className}`}>

@@ -199,7 +199,7 @@ export class RouteOptimizer {
     
     if (routeFrequency.topRoute && routeFrequency.topRoute.frequency > 5) {
       recommendations.push({
-        type: 'route',
+        id: 'route-optimization', category: 'route',
         priority: 'high',
         title: 'Оптимізація частого маршруту',
         description: `Маршрут ${routeFrequency.topRoute.from} → ${routeFrequency.topRoute.to} використовується часто. Розгляньте укладання договору з постійними клієнтами.`,
@@ -212,7 +212,7 @@ export class RouteOptimizer {
     const highCostRoutes = this.findHighCostRoutes();
     if (highCostRoutes.length > 0) {
       recommendations.push({
-        type: 'fuel',
+        id: 'fuel-optimization', category: 'fuel',
         priority: 'medium',
         title: 'Високі витрати на паливо',
         description: 'Виявлено маршрути з підвищеними витратами на паливо. Рекомендується оптимізація.',
@@ -261,3 +261,4 @@ export class RouteOptimizer {
       }));
   }
 } 
+

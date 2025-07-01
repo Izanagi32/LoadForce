@@ -12,19 +12,32 @@ interface AIInsightsProps {
   className?: string;
 }
 
+type Priority = 'high' | 'medium' | 'low';
+
+interface SmartRecommendation {
+  id: string;
+  priority: Priority;
+  title: string;
+  description: string;
+  action: string;
+  impact: string;
+  confidence: number;
+  reasoning: string[];
+}
+
 export default function AIInsights({ cargoItems, calculationResult, className = '' }: AIInsightsProps) {
   const [smartAnalysis, setSmartAnalysis] = useState<any>(null);
   const [isLoading, setIsLoading] = useState(false);
 
   // Генерація розумних рекомендацій
-  const generateSmartRecommendations = (calculation: CalculationResult) => {
-    const recommendations = [];
+  const generateSmartRecommendations = (calculation: CalculationResult): SmartRecommendation[] => {
+    const recommendations: SmartRecommendation[] = [];
 
     // 💰 Аналіз рентабельності
     if (calculation.profitMargin < 15) {
       recommendations.push({
         id: 'profit-optimization',
-        priority: 'high',
+        priority: 'high' as Priority,
         title: '💰 Підвищити рентабельність',
         description: `Маржа ${calculation.profitMargin.toFixed(1)}% нижче безпечного мінімуму 15%`,
         action: 'Збільшити фрахт на 5-8% або знайти зворотній вантаж',
@@ -43,7 +56,7 @@ export default function AIInsights({ cargoItems, calculationResult, className = 
     if (fuelPercentage > 50) {
       recommendations.push({
         id: 'fuel-optimization',
-        priority: 'high',
+        priority: 'high' as Priority,
         title: '⛽ Оптимізувати витрати на паливо',
         description: `${fuelPercentage.toFixed(1)}% витрат - це паливо (норма 45%)`,
         action: 'Еко-водіння, вибір дешевих АЗС, техогляд двигуна',
@@ -62,7 +75,7 @@ export default function AIInsights({ cargoItems, calculationResult, className = 
     if (loadUtilization < 70) {
       recommendations.push({
         id: 'load-optimization',
-        priority: 'medium',
+        priority: 'medium' as Priority,
         title: '📦 Збільшити завантаження',
         description: `Використовується лише ${loadUtilization.toFixed(1)}% вантажопідйомності`,
         action: 'Шукати додаткові вантажі, LTL перевезення, консолідація',
@@ -81,7 +94,7 @@ export default function AIInsights({ cargoItems, calculationResult, className = 
     if (repositioningRatio > 0.25) {
       recommendations.push({
         id: 'route-optimization',
-        priority: 'medium',
+        priority: 'medium' as Priority,
         title: '🗺️ Оптимізувати маршрут',
         description: `${(repositioningRatio * 100).toFixed(1)}% відстані - порожні переїзди`,
         action: 'Шукати зворотні вантажі через біржі, планувати кільцеві маршрути',
@@ -96,7 +109,7 @@ export default function AIInsights({ cargoItems, calculationResult, className = 
     }
 
     return recommendations.sort((a, b) => {
-      const priorityOrder = { high: 3, medium: 2, low: 1 };
+      const priorityOrder: Record<Priority, number> = { high: 3, medium: 2, low: 1 };
       return priorityOrder[b.priority] - priorityOrder[a.priority];
     });
   };
@@ -163,7 +176,7 @@ export default function AIInsights({ cargoItems, calculationResult, className = 
     return 'text-red-400';
   };
 
-  const getPriorityIcon = (priority: string) => {
+  const getPriorityIcon = (priority: Priority) => {
     switch (priority) {
       case 'high': return '🔴';
       case 'medium': return '🟡';
@@ -247,7 +260,7 @@ export default function AIInsights({ cargoItems, calculationResult, className = 
                 <h3 className="text-lg font-semibold text-white">Розумні рекомендації</h3>
               </div>
 
-              {smartAnalysis.recommendations.slice(0, 2).map((rec: any, index: number) => (
+              {smartAnalysis.recommendations.slice(0, 2).map((rec: SmartRecommendation, index: number) => (
                 <div
                   key={rec.id}
                   className="bg-gray-800/30 border border-gray-600 rounded-lg p-4 hover:border-blue-500/50 transition-all"

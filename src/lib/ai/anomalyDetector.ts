@@ -310,7 +310,8 @@ export class AnomalyDetector {
     // Генерація рекомендацій на основі аномалій
     if (byType.fuel > 5) {
       recommendations.push({
-        type: 'fuel',
+        id: 'fuel-anomaly-report',
+        category: 'fuel',
         priority: 'high',
         title: 'Часті аномалії витрат палива',
         description: 'Виявлено багато відхилень у витратах палива. Рекомендується технічний огляд автопарку.',
@@ -321,7 +322,8 @@ export class AnomalyDetector {
 
     if (byType.time > 3) {
       recommendations.push({
-        type: 'timing',
+        id: 'time-anomaly-report',
+        category: 'timing',
         priority: 'medium',
         title: 'Проблеми з часом доставки',
         description: 'Часті затримки в доставці. Необхідно переглянути планування маршрутів.',

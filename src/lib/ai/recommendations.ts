@@ -120,7 +120,7 @@ export class RouteRecommendationEngine {
     
     if (fuelCostTrend === 'increasing') {
       recommendations.push({
-        type: 'fuel',
+        id: 'fuel-price-recommendation', category: 'fuel',
         priority: 'high',
         title: 'Зростання цін на паливо',
         description: 'Прогнозується зростання цін на паливо. Розгляньте фіксацію цін на послуги або хеджування ризиків.',
@@ -154,7 +154,7 @@ export class RouteRecommendationEngine {
     if (routeAnalysis && routeAnalysis.confidence > 0.7) {
       if (routeAnalysis.predicted > 2000) {
         recommendations.push({
-          type: 'route',
+          id: 'route-optimization-recommendation', category: 'route',
           priority: 'medium',
           title: 'Дорогий маршрут',
           description: 'Цей маршрут має високі витрати. Розгляньте альтернативні варіанти або підвищте тариф.',
@@ -167,7 +167,7 @@ export class RouteRecommendationEngine {
     // Рекомендації по вазі вантажу
     if (cargoWeight > 20000) {
       recommendations.push({
-        type: 'route',
+        id: 'route-optimization-recommendation', category: 'route',
         priority: 'low',
         title: 'Важкий вантаж',
         description: 'Важкий вантаж збільшує витрати палива. Врахуйте це в ціноутворенні.',
@@ -189,7 +189,7 @@ export class RouteRecommendationEngine {
     const stats = this.fuelPredictor.getStatistics();
     if (!stats || stats.totalTrips < 10) {
       recommendations.push({
-        type: 'route',
+        id: 'route-optimization-recommendation', category: 'route',
         priority: 'medium',
         title: 'Збір історичних даних',
         description: 'Додайте більше історичних даних для покращення точності AI прогнозів.',
@@ -201,7 +201,7 @@ export class RouteRecommendationEngine {
     // Рекомендація по автоматизації
     if (stats && stats.totalTrips > 50) {
       recommendations.push({
-        type: 'route',
+        id: 'route-optimization-recommendation', category: 'route',
         priority: 'low',
         title: 'Автоматизація процесів',
         description: 'У вас достатньо даних для впровадження автоматичного планування маршрутів.',
@@ -274,3 +274,5 @@ export class RouteRecommendationEngine {
     return 'Все виглядає добре! Продовжуйте збирати дані для покращення прогнозів';
   }
 } 
+
+
