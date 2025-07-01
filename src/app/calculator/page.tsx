@@ -903,6 +903,19 @@ export default function CalculatorPage() {
           </div>
 
         </div>
+
+        {/* AI Dashboard - Повноекранна секція */}
+        {calculationResult && (
+          <div className="mt-8 col-span-12">
+            <div className="bg-black/30 backdrop-blur-xl rounded-xl border border-white/10 shadow-2xl p-1">
+              <iframe 
+                src="/dashboard" 
+                className="w-full h-[800px] rounded-lg border-0"
+                title="AI Analytics Dashboard"
+              />
+            </div>
+          </div>
+        )}
       </div>
     </div>
   );
