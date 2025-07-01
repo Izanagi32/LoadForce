@@ -36,7 +36,7 @@ export async function getCityCoordinates(cityName: string): Promise<CityCoordina
       },
       timeout: 5000,
       headers: {
-        'User-Agent': 'EuroTanemFORCE-Logistics-App/1.0'
+        'User-Agent': 'EuroTandemFORCE-Logistics-App/1.0'
       }
     });
     

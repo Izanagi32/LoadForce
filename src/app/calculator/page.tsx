@@ -149,7 +149,7 @@ export default function CalculatorPage() {
               </div>
               <div>
                 <h1 className="text-lg font-bold bg-gradient-to-r from-cyan-400 to-purple-400 bg-clip-text text-transparent">
-                  EuroTanemFORCE
+                  EuroTandemFORCE
                 </h1>
               </div>
             </div>

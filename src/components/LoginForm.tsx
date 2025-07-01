@@ -39,7 +39,7 @@ export default function LoginForm({ onSubmit, isLoading = false }: LoginFormProp
           <div className="inline-flex items-center justify-center w-16 h-16 bg-blue-600 rounded-full mb-4">
             <Truck className="w-8 h-8 text-white" />
           </div>
-          <h1 className="text-2xl font-bold text-gray-900 mb-2">EuroTanemFORCE</h1>
+          <h1 className="text-2xl font-bold text-gray-900 mb-2">EuroTandemFORCE</h1>
           <p className="text-gray-600">Увійдіть до вашого аккаунту</p>
         </div>
 

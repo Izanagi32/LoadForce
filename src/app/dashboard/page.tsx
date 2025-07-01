@@ -4,7 +4,7 @@ export default function DashboardPage() {
       <div className="max-w-7xl mx-auto">
         <div className="bg-white rounded-lg shadow-md p-8">
           <h1 className="text-3xl font-bold text-gray-900 mb-4">
-            🎉 Вітаємо в EuroTanemFORCE!
+            🎉 Вітаємо в EuroTandemFORCE!
           </h1>
           <p className="text-gray-600 mb-6">
             Ви успішно увійшли в систему. Тут буде розміщено дашборд з розрахунками прибутковості рейсів.

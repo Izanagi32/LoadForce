@@ -13,7 +13,7 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "EuroTanemFORCE - Розрахунок прибутковості рейсів",
+  title: "EuroTandemFORCE - Розрахунок прибутковості рейсів",
   description: "Веб-додаток для розрахунку прибутковості рейсів логістичної компанії",
 };
 
